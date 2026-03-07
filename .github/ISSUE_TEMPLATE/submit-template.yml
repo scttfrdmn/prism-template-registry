@@ -1,0 +1,86 @@
+name: Submit Template
+description: Contribute a new research environment template to the registry
+labels: ["new-template"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for contributing a template! We'll review and test it before merging.
+
+  - type: input
+    id: name
+    attributes:
+      label: Template Name
+      description: Human-readable name shown in `prism templates list`
+      placeholder: e.g. Jupyter + CUDA ML Environment
+    validations:
+      required: true
+
+  - type: input
+    id: slug
+    attributes:
+      label: Slug
+      description: Used in `prism launch <slug>` (lowercase, hyphens ok)
+      placeholder: e.g. jupyter-cuda-ml
+    validations:
+      required: true
+
+  - type: input
+    id: description
+    attributes:
+      label: One-line Description
+      placeholder: e.g. GPU-accelerated Python ML with CUDA 12 and JupyterLab
+    validations:
+      required: true
+
+  - type: dropdown
+    id: base
+    attributes:
+      label: Base OS
+      options:
+        - ubuntu-24.04
+        - ubuntu-22.04
+        - amazon-linux-2023
+    validations:
+      required: true
+
+  - type: dropdown
+    id: connection_type
+    attributes:
+      label: Connection Type
+      options:
+        - ssh
+        - web
+        - both
+    validations:
+      required: true
+
+  - type: textarea
+    id: template_yaml
+    attributes:
+      label: Template YAML
+      description: Paste your complete template YAML, or link to a fork/branch
+      render: yaml
+    validations:
+      required: true
+
+  - type: textarea
+    id: testing
+    attributes:
+      label: Testing Notes
+      description: How did you test this? What region and instance type?
+      placeholder: |
+        Tested on: us-west-2, t3.medium
+        Launch time: ~5 min
+        Verified: service started, web UI accessible on port XXXX
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Submission Checklist
+      options:
+        - label: I have personally launched and tested this on a real AWS instance
+          required: true
+        - label: Template has `validation_status: "community"` set
+          required: true
+        - label: External downloads use pinned versions (no `latest` tags in URLs)
