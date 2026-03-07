@@ -1,0 +1,76 @@
+version: "1"
+# Template index — Prism reads this file to discover available community templates
+# without needing to scrape the GitHub API.
+#
+# To add a new template: submit a PR adding your .yml file to templates/
+# and adding an entry here.
+templates:
+  - slug: base-ubuntu-apt
+    name: "Ubuntu 24.04 Base (APT)"
+    file: templates/base-ubuntu-apt.yml
+    category: "Base"
+
+  - slug: datasette
+    name: "Datasette Data Explorer"
+    file: templates/datasette.yml
+    category: "Research Tools"
+
+  - slug: streamlit
+    name: "Streamlit Data App"
+    file: templates/streamlit.yml
+    category: "Data Science"
+
+  - slug: label-studio
+    name: "Label Studio ML Annotation"
+    file: templates/label-studio.yml
+    category: "Machine Learning"
+
+  - slug: openrefine
+    name: "OpenRefine Data Cleaning"
+    file: templates/openrefine.yml
+    category: "Research Tools"
+
+  - slug: python-ml-config
+    name: "Configurable Python ML Environment"
+    file: templates/python-ml-configurable.yml
+    category: "Machine Learning"
+
+  - slug: r-base-ubuntu24
+    name: "R Base (Ubuntu 24.04)"
+    file: templates/r-base-ubuntu24.yml
+    category: "Research Tools"
+
+  - slug: r-rstudio-server
+    name: "R + RStudio Server"
+    file: templates/r-rstudio-server.yml
+    category: "Research Tools"
+
+  - slug: r-research-full-stack
+    name: "R Research Full Stack"
+    file: templates/r-research-full-stack.yml
+    category: "Research Tools"
+
+  - slug: r-shiny
+    name: "R Shiny Server"
+    file: templates/r-shiny-server.yml
+    category: "Research Tools"
+
+  - slug: r-publishing-stack
+    name: "R Research Publishing Stack"
+    file: templates/r-publishing-stack.yml
+    category: "Research Tools"
+
+  - slug: collaborative-workspace
+    name: "Collaborative Research Workspace"
+    file: templates/collaborative-workspace.yml
+    category: "Collaborative Research"
+
+  - slug: ubuntu-datascience
+    name: "Ubuntu Data Science Workstation"
+    file: templates/ubuntu-datascience.yml
+    category: "Data Science"
+
+  - slug: ultimate-workstation
+    name: "Ultimate Research Workstation"
+    file: templates/ultimate-research-workstation.yml
+    category: "Multi-Purpose"
