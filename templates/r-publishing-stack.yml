@@ -1,0 +1,189 @@
+name: "R Research Publishing Stack"
+slug: "r-publishing-stack"
+description: "Complete R research environment with Quarto, LaTeX, Python (inherits from R + RStudio Server)"
+long_description: |
+  Full-featured R research environment built via template stacking.
+
+  Inherits from R + RStudio Server, adding:
+  - Quarto 1.6.33 for scientific publishing
+  - TeX Live 2024 (full LaTeX distribution)
+  - Python 3.12 with Jupyter Lab
+  - Database clients (PostgreSQL, MySQL, SQLite)
+  - Git LFS for large files
+  - Complete data science toolkit
+
+  This is the top layer of the stacked template approach:
+    Layer 1: R Base (R 4.4+ with essential packages)
+    Layer 2: + RStudio Server (web IDE)
+    Layer 3: + Publishing tools (this template)
+
+author: "Prism Team"
+version: "1.0.0"
+base: "ubuntu-24.04"
+
+connection_type: "ssh"
+
+complexity: "complex"
+category: "Research Tools"
+domain: "research"
+
+icon: "📚"
+color: "#276DC3"
+popular: true
+
+architecture: "x86_64"
+
+package_manager: "apt"
+
+inherits: ["R + RStudio Server"]
+
+parameters:
+  rstudio_version:
+    name: "rstudio_version"
+    display_name: "RStudio Server Version"
+    description: "RStudio Server version to install"
+    type: "choice"
+    choices: ["latest", "2026.01.1-403", "2026.01.0-392", "2024.12.1-542", "2024.09.1-394"]
+    default: "latest"
+    group: "Development Environment"
+    order: 1
+
+  install_languageserver:
+    name: "install_languageserver"
+    display_name: "Install Language Server"
+    description: "Install R languageserver package for LSP support in editors"
+    type: "bool"
+    default: true
+    group: "R Packages"
+    order: 10
+
+  install_renv:
+    name: "install_renv"
+    display_name: "Install renv"
+    description: "Install renv package for reproducible R environments"
+    type: "bool"
+    default: true
+    group: "R Packages"
+    order: 20
+
+packages:
+  latex:
+    - "texlive-full"
+    - "texlive-xetex"
+    - "texlive-fonts-extra"
+    - "pandoc"
+    - "ghostscript"
+    - "pdftk-java"
+    - "imagemagick"
+  databases:
+    - "postgresql-client"
+    - "mysql-client"
+    - "sqlite3"
+  python:
+    - "python3.12"
+    - "python3.12-dev"
+    - "python3.12-venv"
+    - "python3-pip"
+    - "python3-numpy"
+    - "python3-pandas"
+    - "python3-matplotlib"
+    - "python3-seaborn"
+    - "python3-sklearn"
+    - "python3-scipy"
+
+services:
+  - name: "jupyter"
+    port: 8888
+    type: "web"
+    description: "Jupyter Notebook Server"
+    start_command: "jupyter lab --ip=0.0.0.0 --no-browser"
+    check_command: "pgrep -f jupyter-lab"
+
+ports:
+  - 22
+  - 8787
+  - 8888
+
+post_install: |
+  #!/bin/bash
+  set -e
+
+  export DEBIAN_FRONTEND=noninteractive
+  export NEEDRESTART_MODE=a
+
+  echo "🔧 Installing Publishing Stack layer..."
+
+  apt-get update
+
+  echo "📝 Installing Quarto 1.6.33..."
+  wget https://github.com/quarto-dev/quarto-cli/releases/download/v1.6.33/quarto-1.6.33-linux-amd64.deb
+  apt-get install -y ./quarto-1.6.33-linux-amd64.deb
+  rm quarto-1.6.33-linux-amd64.deb
+
+  echo "📦 Installing R publishing packages..."
+  Rscript -e "
+  options(repos = c(CRAN = 'https://packagemanager.posit.co/cran/__linux__/noble/latest'))
+  install.packages(c(
+    'bookdown', 'blogdown', 'xaringan', 'gt', 'gtsummary',
+    'DBI', 'RSQLite', 'RPostgres', 'RMySQL', 'reticulate', 'shiny', 'plotly'
+  ))
+  "
+
+  echo "🐍 Installing JupyterLab in isolated venv..."
+  python3 -m venv --system-site-packages /opt/jupyterlab
+  /opt/jupyterlab/bin/pip install --quiet jupyterlab
+  ln -sf /opt/jupyterlab/bin/jupyter /usr/local/bin/jupyter
+  ln -sf /opt/jupyterlab/bin/jupyter-lab /usr/local/bin/jupyter-lab
+
+  echo "📦 Installing Git LFS..."
+  curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash
+  apt-get install -y git-lfs
+  git lfs install --system
+
+  mkdir -p /home/researcher/{notebooks,documents}
+  chown -R researcher:researcher /home/researcher
+
+  {{if .install_languageserver}}
+  R -e "install.packages('languageserver', repos='https://cloud.r-project.org')"
+  {{end}}
+
+  {{if .install_renv}}
+  R -e "install.packages('renv', repos='https://cloud.r-project.org')"
+  {{end}}
+
+  apt-get autoremove -y && apt-get clean
+
+  echo "✅ Publishing Stack layer installation complete!"
+  INSTANCE_IP=$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4 2>/dev/null || hostname -I | awk '{print $1}')
+  echo "🖥️  RStudio Server: http://${INSTANCE_IP}:8787"
+
+idle_detection:
+  enabled: true
+  idle_threshold_minutes: 30
+  check_processes:
+    - "R"
+    - "rsession"
+    - "rstudio"
+    - "python"
+    - "jupyter"
+
+instance_defaults:
+  ports: [22, 8787, 8888]
+  root_volume_gb: 80
+  instance_type_preference: ["m7i.xlarge", "m6i.xlarge", "m6a.xlarge", "m7i.2xlarge"]
+
+components:
+  r_version: "4.4.2"
+  rstudio_server_version: "2026.01.1-403"
+  quarto_version: "1.6.33"
+  python_version: "3.12"
+
+tags:
+  type: "research"
+  purpose: "data-science"
+  level: "advanced"
+  language: "r-python"
+  layer: "publishing"
+  web_interface: "true"
+  collaborative: "true"
+  stacked: "true"

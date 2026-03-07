@@ -1,0 +1,80 @@
+name: "Ubuntu Data Science Workstation"
+slug: "ubuntu-datascience"
+description: "Complete data science environment with both GUI and headless capabilities"
+long_description: "Full-featured data science workstation with Jupyter, RStudio, Python, R, and desktop environment. Use via remote desktop for GUI work or SSH terminal for headless automation."
+base: "ubuntu-22.04"
+
+inherits: ["Docker Foundation"]
+
+connection_type: "both"
+
+complexity: "moderate"
+category: "Data Science"
+domain: "datascience"
+
+icon: "📊"
+color: "#e95420"
+popular: true
+
+package_manager: "conda"
+packages:
+  system:
+    - ubuntu-desktop-minimal
+    - firefox
+    - git
+    - curl
+    - build-essential
+  conda:
+    - python=3.11
+    - jupyter
+    - jupyterlab
+    - pandas
+    - numpy
+    - scikit-learn
+    - matplotlib
+    - seaborn
+    - plotly
+  pip:
+    - streamlit
+    - dash
+
+services:
+  - name: gdm
+    enable: true
+  - name: jupyter
+    port: 8888
+    enable: true
+
+users:
+  - name: datascientist
+    groups: ["sudo", "docker"]
+    shell: "/bin/bash"
+
+idle_detection:
+  enabled: true
+  idle_threshold_minutes: 15
+  hibernate_threshold_minutes: 45
+  check_interval_minutes: 5
+
+instance_defaults:
+  type: "t3.large"
+  ports: [22, 8888]
+  estimated_cost_per_hour:
+    x86_64: 0.0928
+    arm64: 0.0736
+
+estimated_launch_time: 10
+prerequisites:
+  - "Python programming experience"
+  - "Data science workflow familiarity"
+learning_resources:
+  - "https://jupyter.org/documentation"
+  - "https://pandas.pydata.org/getting_started.html"
+
+version: "1.0.0"
+validation_status: "validated"
+maintainer: "Prism Team"
+tags:
+  desktop: "gnome"
+  gui: "true"
+  development: "true"

@@ -1,0 +1,146 @@
+name: "Ultimate Research Workstation"
+slug: "ultimate-workstation"
+description: "Complete research environment supporting all connection methods"
+long_description: "The ultimate research workstation with desktop environment (DCV), web interfaces (Jupyter, RStudio, Streamlit), and SSH terminal. Choose your preferred interface or use multiple simultaneously."
+base: "ubuntu-22.04"
+
+inherits: ["Docker Foundation"]
+
+connection_type: "all"
+
+complexity: "advanced"
+category: "Multi-Purpose"
+domain: "research"
+
+icon: "🚀"
+color: "#6366f1"
+popular: true
+featured: true
+
+plugins:
+  enabled:
+    - name: "git"
+      version: "latest"
+      configuration:
+        enable_lfs: true
+
+parameters:
+  rstudio_version:
+    name: "rstudio_version"
+    display_name: "RStudio Server Version"
+    description: "RStudio Server version to install"
+    type: "choice"
+    choices: ["latest", "2026.01.0-392", "2024.12.1-542", "2024.09.1-394"]
+    default: "latest"
+    group: "Development Environment"
+    order: 1
+
+package_manager: "conda"
+packages:
+  system:
+    - ubuntu-desktop-minimal
+    - firefox
+    - code
+    - curl
+    - vim
+    - htop
+    - r-base
+    - nodejs
+    - pandoc
+    - texlive-latex-base
+  conda:
+    - python=3.11
+    - r-base=4.3
+    - julia=1.9
+    - jupyterlab=4.0
+    - jupyter-server-proxy
+    - rstudio
+    - pandas
+    - numpy
+    - scikit-learn
+    - matplotlib
+    - seaborn
+    - plotly
+    - r-irkernel
+    - r-tidyverse
+    - r-ggplot2
+  pip:
+    - streamlit
+    - dash
+    - gradio
+    - bokeh
+    - wandb
+    - mlflow
+
+services:
+  - name: gdm
+    enable: true
+  - name: jupyterlab
+    port: 8888
+    enable: true
+  - name: rstudio-server
+    port: 8787
+    enable: true
+  - name: streamlit-dashboard
+    port: 8501
+    enable: false
+  - name: mlflow-ui
+    port: 5000
+    enable: false
+
+users:
+  - name: researcher
+    groups: ["sudo", "docker"]
+    shell: "/bin/bash"
+
+post_install: |
+  #!/bin/bash
+  if [ "{{.rstudio_version}}" = "latest" ]; then
+    RSTUDIO_VERSION="2026.01.0-392"
+  else
+    RSTUDIO_VERSION="{{.rstudio_version}}"
+  fi
+  echo "Installing RStudio Server version: ${RSTUDIO_VERSION}"
+  wget https://download2.rstudio.org/server/jammy/amd64/rstudio-server-${RSTUDIO_VERSION}-amd64.deb
+  sudo gdebi --non-interactive rstudio-server-${RSTUDIO_VERSION}-amd64.deb
+  rm rstudio-server-${RSTUDIO_VERSION}-amd64.deb
+
+  sudo echo "www-port=8787" >> /etc/rstudio/rserver.conf
+  sudo echo "www-address=0.0.0.0" >> /etc/rstudio/rserver.conf
+
+  RESEARCHER_PASS=$(openssl rand -base64 16 | tr -dc 'a-zA-Z0-9' | head -c 16)
+  echo "researcher:${RESEARCHER_PASS}" | sudo chpasswd
+  echo "⚠️  SAVE THIS LOGIN PASSWORD: researcher / ${RESEARCHER_PASS}"
+
+idle_detection:
+  enabled: true
+  idle_threshold_minutes: 30
+  hibernate_threshold_minutes: 90
+  check_interval_minutes: 10
+
+instance_defaults:
+  type: "r5.xlarge"
+  ports: [22, 8888, 8787, 8501, 5000]
+  estimated_cost_per_hour:
+    x86_64: 0.288
+    arm64: 0.2304
+
+estimated_launch_time: 12
+prerequisites:
+  - "Research computing experience"
+  - "Familiarity with multiple tools (Python, R, terminal)"
+learning_resources:
+  - "https://jupyterlab.readthedocs.io/"
+  - "https://rstudio.com/resources/"
+
+version: "1.0.0"
+validation_status: "testing"
+maintainer: "Prism Team"
+tags:
+  multi_modal: "true"
+  desktop: "true"
+  web_interface: "true"
+  terminal: "true"
+  jupyter: "true"
+  rstudio: "true"
+  premium: "true"

@@ -1,0 +1,94 @@
+name: "Collaborative Research Workspace"
+slug: "collaborative-workspace"
+description: "Multi-language collaborative environment optimized for team research projects"
+long_description: |
+  A comprehensive collaborative workspace supporting Python, R, and Julia with integrated
+  research user management, shared EFS storage, and collaboration tools. Perfect for
+  interdisciplinary research teams requiring seamless data and code sharing.
+base: "ubuntu-22.04"
+
+inherits: ["Docker Foundation"]
+
+connection_type: "ssh"
+
+complexity: "moderate"
+category: "Collaborative Research"
+domain: "collaboration"
+
+icon: "👥"
+color: "#2E8B57"
+popular: true
+
+package_manager: "conda"
+
+packages:
+  conda:
+    - python=3.11
+    - r-base=4.3
+    - julia=1.9
+    - jupyter
+    - jupyterlab
+    - numpy
+    - pandas
+    - matplotlib
+    - scikit-learn
+    - r-tidyverse
+    - r-shiny
+    - r-rmarkdown
+    - git
+    - git-lfs
+    - jupyter-collaboration
+  system:
+    - "code-server"
+    - "rstudio-server"
+    - "docker.io"
+    - "tmux"
+    - "screen"
+
+services:
+  - name: "jupyter"
+    port: 8888
+    enable: true
+  - name: "rstudio-server"
+    port: 8787
+    enable: true
+  - name: "code-server"
+    port: 8443
+    enable: true
+  - name: "julia-notebook"
+    port: 9999
+    enable: true
+
+users:
+  - name: "workspace"
+    groups: ["sudo", "docker", "rstudio-users"]
+
+instance_defaults:
+  ports: [22, 8888, 8787, 8443, 9999]
+  instance_type_preference: ["m5.xlarge", "m5.2xlarge", "c5.2xlarge"]
+
+idle_detection:
+  enabled: true
+  idle_threshold_minutes: 120
+  hibernate_threshold_minutes: 180
+  check_interval_minutes: 10
+
+version: "2.0.0"
+maintainer: "Prism Team"
+tags:
+  type: "research"
+  language: "multi-language"
+  purpose: "collaboration"
+  requires: "memory-balanced"
+  team_support: "true"
+
+learning_resources:
+  - "https://jupyter.org/collaboration"
+  - "https://docs.rstudio.com/ide/server-pro/collaboration/"
+
+prerequisites:
+  - "Team coordination and communication skills"
+  - "Basic understanding of Git collaboration workflows"
+  - "Familiarity with one or more: Python, R, or Julia"
+
+estimated_launch_time: 10
