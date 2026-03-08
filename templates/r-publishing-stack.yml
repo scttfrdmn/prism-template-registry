@@ -140,6 +140,17 @@ post_install: |
   apt-get install -y git-lfs
   git lfs install --system
 
+  # Set password for researcher user (required for RStudio Server PAM authentication)
+  RESEARCHER_PASSWORD=$(openssl rand -base64 12)
+  echo "researcher:${RESEARCHER_PASSWORD}" | chpasswd
+  echo ""
+  echo "============================================="
+  echo "  RStudio Server Login Credentials"
+  echo "  Username: researcher"
+  echo "  Password: ${RESEARCHER_PASSWORD}"
+  echo "============================================="
+  echo ""
+
   mkdir -p /home/researcher/{notebooks,documents}
   chown -R researcher:researcher /home/researcher
 
